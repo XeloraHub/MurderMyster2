@@ -1,1 +1,259 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/renardofficiel/game/refs/heads/main/MurderMystery2/main.lua", true))()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("PloyGui") then PlayerGui.PloyGui:Destroy() end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PloyGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- Main Frame
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 320, 0, 200)
+Main.Position = UDim2.new(0.5, -160, 0.5, -100)
+Main.BackgroundColor3 = Color3.fromRGB(12, 14, 28)
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Main.Parent = ScreenGui
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 20)
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(50, 110, 255)
+MainStroke.Thickness = 2.5
+MainStroke.Parent = Main
+
+-- Header
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 62)
+Header.BackgroundColor3 = Color3.fromRGB(22, 25, 45)
+Header.BorderSizePixel = 0
+Header.ZIndex = 2
+Header.Parent = Main
+Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 20)
+local HeaderFill = Instance.new("Frame")
+HeaderFill.Size = UDim2.new(1, 0, 0.5, 0)
+HeaderFill.Position = UDim2.new(0, 0, 0.5, 0)
+HeaderFill.BackgroundColor3 = Color3.fromRGB(22, 25, 45)
+HeaderFill.BorderSizePixel = 0
+HeaderFill.ZIndex = 2
+HeaderFill.Parent = Header
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Xelora Weapon Spawner"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 20
+Title.Font = Enum.Font.GothamBlack
+Title.ZIndex = 3
+Title.Parent = Header
+
+-- Item Name Input
+local ItemInput = Instance.new("TextBox")
+ItemInput.Size = UDim2.new(1, -30, 0, 34)
+ItemInput.Position = UDim2.new(0, 15, 0, 74)
+ItemInput.BackgroundTransparency = 1
+ItemInput.Text = ""
+ItemInput.PlaceholderText = "Item name..."
+ItemInput.PlaceholderColor3 = Color3.fromRGB(100, 110, 150)
+ItemInput.TextColor3 = Color3.fromRGB(220, 225, 255)
+ItemInput.TextSize = 17
+ItemInput.Font = Enum.Font.GothamMedium
+ItemInput.ClearTextOnFocus = false
+ItemInput.Parent = Main
+
+-- Divider
+local Divider = Instance.new("Frame")
+Divider.Size = UDim2.new(1, -30, 0, 1)
+Divider.Position = UDim2.new(0, 15, 0, 112)
+Divider.BackgroundColor3 = Color3.fromRGB(45, 50, 80)
+Divider.BorderSizePixel = 0
+Divider.Parent = Main
+
+-- Spawn Button
+local SpawnBtn = Instance.new("TextButton")
+SpawnBtn.Size = UDim2.new(1, -30, 0, 48)
+SpawnBtn.Position = UDim2.new(0, 15, 0, 136)
+SpawnBtn.BackgroundColor3 = Color3.fromRGB(45, 105, 255)
+SpawnBtn.BorderSizePixel = 0
+SpawnBtn.Text = "Start Spawning"
+SpawnBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpawnBtn.TextSize = 18
+SpawnBtn.Font = Enum.Font.GothamBlack
+SpawnBtn.AutoButtonColor = false
+SpawnBtn.Parent = Main
+Instance.new("UICorner", SpawnBtn).CornerRadius = UDim.new(0, 14)
+
+SpawnBtn.MouseEnter:Connect(function()
+    TweenService:Create(SpawnBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(80, 145, 255)}):Play()
+end)
+SpawnBtn.MouseLeave:Connect(function()
+    TweenService:Create(SpawnBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(45, 105, 255)}):Play()
+end)
+
+-- ========== Loading Screen ==========
+local LoadFrame = Instance.new("Frame")
+LoadFrame.Size = UDim2.new(0, 340, 0, 170)
+LoadFrame.Position = UDim2.new(0.5, -170, 0.5, -85)
+LoadFrame.BackgroundColor3 = Color3.fromRGB(12, 14, 28)
+LoadFrame.BorderSizePixel = 0
+LoadFrame.Visible = false
+LoadFrame.ZIndex = 10
+LoadFrame.Parent = ScreenGui
+Instance.new("UICorner", LoadFrame).CornerRadius = UDim.new(0, 20)
+local LoadStroke = Instance.new("UIStroke")
+LoadStroke.Color = Color3.fromRGB(50, 110, 255)
+LoadStroke.Thickness = 2.5
+LoadStroke.Parent = LoadFrame
+
+-- Loading title
+local LoadTitle = Instance.new("TextLabel")
+LoadTitle.Size = UDim2.new(1, 0, 0, 50)
+LoadTitle.Position = UDim2.new(0, 0, 0, 20)
+LoadTitle.BackgroundTransparency = 1
+LoadTitle.Text = "Spawning Weapon..."
+LoadTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoadTitle.TextSize = 22
+LoadTitle.Font = Enum.Font.GothamBlack
+LoadTitle.ZIndex = 11
+LoadTitle.Parent = LoadFrame
+
+-- Animated subtitle (will bounce left/right)
+local LoadSub = Instance.new("TextLabel")
+LoadSub.Size = UDim2.new(0.6, 0, 0, 26)
+LoadSub.Position = UDim2.new(0.2, 0, 0, 66)
+LoadSub.BackgroundTransparency = 1
+LoadSub.Text = "Please wait..."
+LoadSub.TextColor3 = Color3.fromRGB(100, 140, 255)
+LoadSub.TextSize = 15
+LoadSub.Font = Enum.Font.GothamMedium
+LoadSub.ZIndex = 11
+LoadSub.Parent = LoadFrame
+
+-- Progress bar background
+local BarBG = Instance.new("Frame")
+BarBG.Size = UDim2.new(1, -40, 0, 10)
+BarBG.Position = UDim2.new(0, 20, 0, 106)
+BarBG.BackgroundColor3 = Color3.fromRGB(28, 32, 58)
+BarBG.BorderSizePixel = 0
+BarBG.ZIndex = 11
+BarBG.Parent = LoadFrame
+Instance.new("UICorner", BarBG).CornerRadius = UDim.new(1, 0)
+
+-- Progress bar fill
+local BarFill = Instance.new("Frame")
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+BarFill.BackgroundColor3 = Color3.fromRGB(45, 105, 255)
+BarFill.BorderSizePixel = 0
+BarFill.ZIndex = 12
+BarFill.Parent = BarBG
+Instance.new("UICorner", BarFill).CornerRadius = UDim.new(1, 0)
+
+-- Timer label
+local TimerLabel = Instance.new("TextLabel")
+TimerLabel.Size = UDim2.new(1, 0, 0, 22)
+TimerLabel.Position = UDim2.new(0, 0, 0, 136)
+TimerLabel.BackgroundTransparency = 1
+TimerLabel.Text = "10s"
+TimerLabel.TextColor3 = Color3.fromRGB(80, 110, 200)
+TimerLabel.TextSize = 14
+TimerLabel.Font = Enum.Font.GothamMedium
+TimerLabel.ZIndex = 11
+TimerLabel.Parent = LoadFrame
+
+-- ========== Subtitle bounce animation ==========
+local function startSubAnimation()
+    local goRight = true
+    local function bounce()
+        if not LoadFrame.Visible then return end
+        local targetX = goRight and 0.28 or 0.12
+        goRight = not goRight
+        TweenService:Create(LoadSub, TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+            Position = UDim2.new(targetX, 0, 0, 66)
+        }):Play()
+        task.wait(0.9)
+        if LoadFrame.Visible then
+            bounce()
+        end
+    end
+    task.spawn(bounce)
+end
+
+-- Dots animation on subtitle
+local dots = {"", ".", "..", "..."}
+local dotIndex = 1
+local function startDotAnimation()
+    task.spawn(function()
+        while LoadFrame.Visible do
+            dotIndex = (dotIndex % 4) + 1
+            LoadSub.Text = "Please wait" .. dots[dotIndex]
+            task.wait(0.45)
+        end
+    end)
+end
+
+-- ========== Logic ==========
+itemdatabase = require(ReplicatedStorage.Database.Sync).Weapons
+
+local function spawnWeapon(name, count)
+    local PlayerData = require(ReplicatedStorage.Modules.ProfileData)
+    local newOwned = PlayerData.Weapons.Owned
+    newOwned[name] = count + (newOwned[name] or 0)
+    RunService:BindToRenderStep("InventoryUpdate", 0, function()
+        PlayerData.Weapons.Owned = newOwned
+    end)
+    LocalPlayer.Character:BreakJoints()
+end
+
+local function opencrate(ITEM_NAME, count)
+    ReplicatedStorage.Remotes.Shop.NewItemReceived:Fire(ITEM_NAME, "Weapons", count)
+    spawnWeapon(ITEM_NAME, count)
+end
+
+local isSpawning = false
+
+SpawnBtn.MouseButton1Click:Connect(function()
+    if isSpawning then return end
+    local itemName = ItemInput.Text
+    if itemName == "" then return end
+    isSpawning = true
+
+    -- Show loading screen
+    LoadFrame.Visible = true
+    BarFill.Size = UDim2.new(0, 0, 1, 0)
+    TimerLabel.Text = "10s"
+    LoadSub.Text = "Please wait"
+    LoadSub.Position = UDim2.new(0.2, 0, 0, 66)
+
+    -- Start animations
+    startSubAnimation()
+    startDotAnimation()
+
+    -- Progress bar and timer
+    local elapsed = 0
+    local duration = 10
+    local stepConn
+    stepConn = RunService.Heartbeat:Connect(function(dt)
+        elapsed = elapsed + dt
+        local progress = math.clamp(elapsed / duration, 0, 1)
+        BarFill.Size = UDim2.new(progress, 0, 1, 0)
+        TimerLabel.Text = tostring(math.ceil(duration - elapsed)) .. "s"
+        if elapsed >= duration then
+            stepConn:Disconnect()
+        end
+    end)
+
+    task.wait(10)
+
+    -- Hide loading and spawn
+    LoadFrame.Visible = false
+    BarFill.Size = UDim2.new(0, 0, 1, 0)
+    opencrate(itemName, 1)
+    isSpawning = false
+end)
